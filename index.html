@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>سبيرو - متجر قطع غيار (نسخة متجاوبة) - إصدار مُصلح</title>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    :root{
+      --primary:#0b63a8;
+      --muted:#6b7280;
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --radius:12px;
+      --gap:14px;
+      --maxwidth:1200px;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:#111}
+    header{background:linear-gradient(90deg,#fff 0%, #f0f6fb 100%);padding:14px 18px;box-shadow:0 2px 6px rgba(0,0,0,0.04);position:sticky;top:0;z-index:60;}
+    .container{max-width:var(--maxwidth);margin:0 auto;display:flex;align-items:center;gap:12px;}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo img{height:40px;display:block}
+    .search{flex:1;position:relative;min-width:180px}
+    .search input{width:100%;padding:10px 44px 10px 14px;border-radius:10px;border:1px solid #e1e6ef;font-size:14px;background:#fff}
+    .search .icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:#eaf3fc;color:var(--primary);padding:8px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center}
+    .header-actions .contact-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:var(--primary);color:#fff;font-size:14px;border:none;cursor:pointer}
+    .cart-wrapper{position:relative;display:inline-block}
+    .cart-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;background:#fff;border:1px solid #e6eef8;cursor:pointer;position:relative}
+    .cart-btn i{color:var(--primary);font-size:18px}
+    .cart-badge{position:absolute;top:-7px;left:-7px;background:#ef4444;color:#fff;min-width:20px;height:20px;border-radius:999px;font-size:12px;display:flex;align-items:center;justify-content:center;padding:0 6px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,0.08);}
+    .cart-dropdown{position:absolute;right:0;top:54px;min-width:320px;max-width:360px;background:var(--card);border-radius:10px;padding:10px;border:1px solid #e9f1fb;box-shadow:0 6px 20px rgba(13,38,71,0.08);display:none;z-index:80}
+    .cart-dropdown.open{display:block}
+    .cart-dropdown .title{font-weight:700;padding:6px 8px;border-bottom:1px solid #f1f5f9;margin-bottom:8px;color:#0f172a}
+    .cart-list{max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding-right:4px}
+    .cart-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:#fbfeff;border:1px solid #f1f7fb}
+    .cart-item .ico{width:44px;height:44px;border-radius:8px;background:#eaf3fc;color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .cart-item .meta{flex:1;min-width:0}
+    .cart-item .meta .name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cart-item .meta .price{font-size:13px;color:var(--primary);font-weight:700;margin-top:4px}
+    .cart-item .remove{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:14px;padding:6px;border-radius:6px}
+    .cart-empty{padding:14px;text-align:center;color:var(--muted);font-size:14px}
+    main{max-width:var(--maxwidth);margin:18px auto;padding:0 12px;display:flex;gap:20px}
+    aside{width:260px}
+    .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+    .categories ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+    .categories li{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid transparent;color:var(--muted);cursor:pointer}
+    .categories li i{background:#eaf3fc;color:var(--primary);padding:6px;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+    .categories li:hover{background:#f3f9ff;color:var(--primary)}
+    .content{flex:1}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .product{display:flex;flex-direction:column;gap:8px}
+    .product .img{width:100%;height:170px;border-radius:8px;object-fit:cover;background:#eef6fb;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+    .product h4{margin:0;font-size:16px}
+    .product .brand{font-size:13px;color:var(--muted)}
+    .product .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .price{font-weight:700;color:var(--primary);display:flex;align-items:center;gap:8px}
+    .add-btn{padding:8px 12px;border-radius:8px;background:var(--primary);color:#fff;border:0;cursor:pointer}
+    footer{text-align:center;padding:20px;color:var(--muted)}
+    @media (max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)} aside{display:none} main{padding:0 12px}}
+    @media (max-width:640px){header .container{padding:8px}.search input{padding:10px 40px 10px 12px;font-size:14px}.grid{grid-template-columns:1fr}.cart-dropdown{left:8px;right:8px;top:62px;min-width:auto;width:calc(100% - 16px)}.cart-dropdown .title{text-align:right}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0">
+        <div class="logo">
+          <img src="https://via.placeholder.com/120x40?text=سبيرو" alt="logo">
+          <div>
+            <div class="brand">سبيرو</div>
+            <div class="tag">قطع غيار سيارات أصلية</div>
+          </div>
+        </div>
+
+        <div class="search" style="min-width:220px">
+          <input id="searchInput" placeholder="ابحث عن قطعة أو ماركة (مثال: فرامل تويوتا)" />
+          <span class="icon" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="header-actions contact-btn" id="contactBtn" type="button"><i class="fa-solid fa-headset"></i> تواصل</button>
+
+        <div class="cart-wrapper" id="cartWrapper" title="سلة المشتريات">
+          <button class="cart-btn" id="cartBtn" aria-haspopup="true" aria-expanded="false" type="button">
+            <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+          </button>
+          <div class="cart-badge" id="cartBadge" style="display:none">0</div>
+
+          <div class="cart-dropdown" id="cartDropdown" role="menu" aria-hidden="true" aria-labelledby="cartBtn">
+            <div class="title">سلة المشتريات</div>
+            <div class="cart-list" id="cartList"></div>
+            <div id="cartEmpty" class="cart-empty" style="display:none">السلة فارغة</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside>
+      <div class="card categories">
+        <h3>التصنيفات</h3>
+        <ul id="categoriesList"></ul>
+      </div>
+
+      <div style="height:14px"></div>
+
+      <div class="card">
+        <h4>تصفية حسب السعر</h4>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="minPrice" type="number" placeholder="الحد الأدنى" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6eef8">
+          <input id="maxPrice" type="number" placeholder="الحد الأقصى" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6eef8">
+        </div>
+        <div style="margin-top:10px"><button class="add-btn" id="filterBtn" type="button"><i class="fa-solid fa-filter"></i> تطبيق</button></div>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="card" style="margin-bottom:12px;">
+        <h2 style="margin:0"><i class="fa-solid fa-car-side" style="color:var(--primary);margin-left:8px"></i> سوق قطع الغيار</h2>
+        <p style="color:var(--muted);margin-top:8px">تصفّح المنتجات — هذا نموذج جاهز يمكنك ربطه بقاعدة بيانات لاحقًا.</p>
+      </div>
+
+      <div class="grid" id="productsGrid"></div>
+    </section>
+  </main>
+
+  <footer>
+    © جميع الحقوق محفوظة 2025
+  </footer>
+
+  <script>
+    const products = [
+        {id:1,name:'طقم فحمات فرامل أمامية',brand:'تويوتا',category:'الفرامل والأقمشة',price:425},
+        {id:2,name:'شمعة أمامي يمين',brand:'نيسان',category:'الإضاءات والمصابيح',price:732},
+        {id:3,name:'فلتر هواء',brand:'كيا',category:'الفلاتر والسيور',price:120},
+        {id:4,name:'كشاف أمامي',brand:'هيونداي',category:'الإضاءات والمصابيح',price:628},
+        {id:5,name:'طقم نابض أمامي',brand:'مازدا',category:'نظام التعليق',price:390},
+        {id:6,name:'مبرد تكييف',brand:'تويوتا',category:'نظام التبريد',price:890}
+      ];
+
+      const faIcons = [
+        'fa-gauge', 'fa-oil-can', 'fa-bolt', 'fa-battery-half', 'fa-car-burst',
+        'fa-screwdriver-wrench', 'fa-snowflake', 'fa-wrench', 'fa-filter', 'fa-lightbulb'
+      ];
+
+      const iconMap = {
+        'الفرامل والأقمشة':'fa-car-burst',
+        'الإضاءات والمصابيح':'fa-lightbulb',
+        'الفلاتر والسيور':'fa-filter',
+        'نظام التعليق':'fa-gear',
+        'نظام التبريد':'fa-snowflake'
+      };
+
+      const productsGrid = document.getElementById('productsGrid');
+      const categoriesList = document.getElementById('categoriesList');
+      const cartListEl = document.getElementById('cartList');
+      const cartDropdown = document.getElementById('cartDropdown');
+      const cartBtn = document.getElementById('cartBtn');
+      const cartWrapper = document.getElementById('cartWrapper');
+      const cartBadge = document.getElementById('cartBadge');
+      const cartEmpty = document.getElementById('cartEmpty');
+
+      function getCart(){ return JSON.parse(localStorage.getItem('cart_v1')||'[]'); }
+      function saveCart(c){ localStorage.setItem('cart_v1', JSON.stringify(c)); updateCartUI(); }
+
+      function updateCartUI(){
+        const cart = getCart();
+        const totalCount = cart.reduce((s,i)=>s+i.qty,0);
+        if(totalCount>0){ cartBadge.style.display='flex'; cartBadge.textContent = totalCount; cartEmpty.style.display='none'; }
+        else { cartBadge.style.display='none'; }
+
+        cartListEl.innerHTML = '';
+        if(cart.length===0){ cartEmpty.style.display='block'; return; }
+        cartEmpty.style.display='none';
+        cart.forEach(entry=>{
+          const prod = products.find(p=>p.id===entry.id);
+          if(!prod) return;
+          const iconClass = faIcons[entry.id % faIcons.length] || 'fa-box';
+          const item = document.createElement('div');
+          item.className = 'cart-item';
+          item.innerHTML = `
+            <div class="ico"><i class="fa-solid ${iconClass}"></i></div>
+            <div class="meta">
+              <div class="name">${escapeHtml(prod.name)}</div>
+              <div class="price">${prod.price} ر.س</div>
+            </div>
+            <button class="remove" title="حذف" data-id="${prod.id}" type="button"><i class="fa-solid fa-trash"></i></button>
+          `;
+          cartListEl.appendChild(item);
+        });
+      }
+
+      function renderProducts(list){
+        productsGrid.innerHTML = '';
+        list.forEach(p=>{
+          const card = document.createElement('div');
+          card.className = 'card product';
+          card.innerHTML = `
+            <div class="img" aria-hidden="true"><i class="fa-solid fa-car-side" style="font-size:28px;color:var(--muted)"></i></div>
+            <h4 title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</h4>
+            <div class="brand">${escapeHtml(p.brand)}</div>
+            <div class="row" style="margin-top:6px">
+              <div class="price"><i class="fa-solid fa-sack-dollar" style="background:#eaf3fc;padding:6px;border-radius:50%;font-size:12px;color:var(--primary)"></i> ${p.price} ر.س</div>
+              <button class="add-btn" data-id="${p.id}" type="button"><i class="fa-solid fa-cart-plus"></i> أضف</button>
+            </div>
+          `;
+          productsGrid.appendChild(card);
+        });
+      }
+
+      function renderCategories(){
+        const cats = [...new Set(products.map(p=>p.category))];
+        categoriesList.innerHTML = '';
+        cats.forEach(c=>{
+          const li = document.createElement('li');
+          const icon = iconMap[c] || 'fa-box';
+          li.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${escapeHtml(c)}</span>`;
+          li.addEventListener('click', ()=> {
+            const filtered = products.filter(p=>p.category===c);
+            renderProducts(filtered);
+          });
+          categoriesList.appendChild(li);
+        });
+      }
+
+      function addToCart(id){
+        const cart = getCart();
+        const found = cart.find(x=>x.id===id);
+        if(found) found.qty++;
+        else cart.push({id:id, qty:1});
+        saveCart(cart);
+      }
+
+      function removeFromCart(id){
+        let cart = getCart();
+        cart = cart.reduce((acc,it)=>{
+          if(it.id===id){
+            if(it.qty>1) acc.push({id:it.id,qty:it.qty-1});
+            // else remove fully
+          } else acc.push(it);
+          return acc;
+        }, []);
+        saveCart(cart);
+      }
+
+      function escapeHtml(text){
+        return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      // Toggle dropdown on cartBtn click
+      cartBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        const isOpen = cartDropdown.classList.contains('open');
+        if(isOpen){
+          cartDropdown.classList.remove('open');
+          cartBtn.setAttribute('aria-expanded','false');
+        } else {
+          updateCartUI();
+          cartDropdown.classList.add('open');
+          cartBtn.setAttribute('aria-expanded','true');
+        }
+      });
+
+      // Prevent clicks inside wrapper from closing dropdown
+      cartWrapper.addEventListener('click', function(e){
+        e.stopPropagation();
+      });
+
+      // Delegate remove button clicks inside cartList
+      cartListEl.addEventListener('click', function(e){
+        const rem = e.target.closest('.remove');
+        if(rem){
+          e.stopPropagation();
+          const id = Number(rem.getAttribute('data-id'));
+          if(!Number.isNaN(id)) removeFromCart(id);
+        }
+      });
+
+      // Delegate add buttons (on product cards)
+      document.body.addEventListener('click', function(e){
+        const add = e.target.closest('.add-btn');
+        if(add){
+          const id = Number(add.getAttribute('data-id'));
+          if(!Number.isNaN(id)) addToCart(id);
+        }
+      });
+
+      // Click outside closes dropdown
+      document.addEventListener('click', function(){
+        if(cartDropdown.classList.contains('open')){
+          cartDropdown.classList.remove('open');
+          cartBtn.setAttribute('aria-expanded','false');
+        }
+      });
+
+      // Filters & search
+      document.getElementById('filterBtn').addEventListener('click', ()=>{
+        const min = Number(document.getElementById('minPrice').value || 0);
+        const maxV = document.getElementById('maxPrice').value;
+        const max = maxV === '' ? Infinity : Number(maxV);
+        const filtered = products.filter(p=>p.price >= min && p.price <= max);
+        renderProducts(filtered);
+      });
+
+      document.getElementById('searchInput').addEventListener('input', function(){
+        const q = this.value.trim().toLowerCase();
+        if(!q) return renderProducts(products);
+        const filtered = products.filter(p=> (p.name+' '+p.brand+' '+p.category).toLowerCase().includes(q));
+        renderProducts(filtered);
+      });
+
+      // init
+function initCart() {
+  // لو السلة مش موجودة في التخزين المحلي، نخليها فاضية
+  if (!localStorage.getItem('cart_v1')) {
+    localStorage.setItem('cart_v1', JSON.stringify([]));
+  }
+  // تحديث الواجهة عند التحميل
+  renderCategories();
+  renderProducts(products);
+  updateCartUI();
+
+  // إخفاء العداد في البداية لو السلة فاضية
+  const currentCart = getCart();
+  if (currentCart.length === 0) {
+    cartBadge.style.display = 'none';
+    cartEmpty.style.display = 'block';
+  } else {
+    cartEmpty.style.display = 'none';
+  }
+}
+
+initCart();
+
+// sync across tabs
+window.addEventListener('storage', function(e) {
+  if (e.key === 'cart_v1') updateCartUI();
+});
+
+  </script>
+</body>
+</html>
