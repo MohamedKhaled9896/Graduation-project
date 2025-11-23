@@ -97,6 +97,30 @@ document.addEventListener('DOMContentLoaded', () => {
     return false;
   }
 
+  // ⭐️ دالة تسجيل الخروج الموحدة ⭐️
+  function handleLogout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+          // 1. حفظ السلة الحالية لحساب المستخدم قبل تسجيل الخروج
+          try {
+              const sessionData = localStorage.getItem('motorstore_session');
+              if (sessionData) {
+                  const sess = JSON.parse(sessionData);
+                  if (sess && sess.user && sess.user.email) {
+                      saveCartForEmail(sess.user.email);
+                  }
+              }
+          } catch (e) { console.warn('Failed to persist cart on logout', e); }
+          
+          // 2. مسح بيانات السلة والجلسة
+          try { localStorage.removeItem('cart'); } catch (e) {}
+          cart = [];
+          try { localStorage.removeItem('motorstore_session'); } catch (e) {}
+          
+          // 3. تحديث وإعادة تحميل الصفحة
+          window.location.reload();
+      }
+  }
+
   // Check if user is logged in and update UI
   function checkUserLogin() {
     // Get session from secure storage
@@ -142,187 +166,188 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check login status on page load
   checkUserLogin();
 
-  // Render header user (greeting + logout) on pages that have the shared header
+  // ⭐️⭐️ التصحيح النهائي في دالة renderHeaderUser() ⭐️⭐️
   function renderHeaderUser() {
-    // allow pages to opt-out by setting `window.__disableHeaderUser = true` before this script runs
-    if (window && window.__disableHeaderUser) return;
-    // read session similar to checkUserLogin
-    let session = null;
-    try {
-      const sessionData = localStorage.getItem('motorstore_session');
-      if (sessionData) {
-        session = JSON.parse(sessionData);
-        if (session.expiresAt && Date.now() > session.expiresAt) {
-          localStorage.removeItem('motorstore_session');
-          session = null;
-        }
-      }
-    } catch (e) {
-      session = null;
-    }
-
-    const header = document.querySelector('header.header-section');
-    if (!header) return;
-    const container = header.querySelector('.container');
-    if (!container) return;
-
-    // right area usually the second child
-    const rightArea = container.children[1] || container.querySelector(':scope > div:last-child');
-    if (!rightArea) return;
-
-    // remove existing injected header-user if present
-    const prev = rightArea.querySelector('.header-user');
-    if (prev) prev.remove();
-
-    const userWrapper = rightArea.querySelector('.user-wrapper, #userWrapper');
-    const cartWrapper = rightArea.querySelector('.cart-wrapper, #cartWrapper');
-
-    if (session) {
-      // hide the default user wrapper (icon + dropdown)
-      if (userWrapper) userWrapper.style.display = 'none';
-
-      // Determine mobile/desktop via body classes set by detectDevice()
-      const isMobile = document.body.classList.contains('device-mobile');
-      let wrapper = null;
-      let btn = null; // desktop logout button (declared outer so scope is available below)
-      if (!isMobile) {
-        // create greeting + logout button for desktop header
-        wrapper = document.createElement('div');
-        wrapper.className = 'header-user';
-        wrapper.style.display = 'flex';
-        wrapper.style.alignItems = 'center';
-        wrapper.style.gap = '10px';
-
-        const greet = document.createElement('span');
-        greet.className = 'header-greeting';
-        greet.textContent = 'مرحبا ' + (session.user?.name || '');
-        greet.style.fontWeight = '700';
-        greet.style.color = '#fff';
-
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'header-logout-btn';
-        btn.innerHTML = '<i class="fa-solid fa-right-from-bracket" style="margin-left:6px"></i> تسجيل الخروج';
-        btn.style.background = 'rgba(255,255,255,0.12)';
-        btn.style.color = '#fff';
-        btn.style.border = '1px solid rgba(255,255,255,0.18)';
-        btn.style.padding = '6px 10px';
-        btn.style.borderRadius = '8px';
-        btn.style.cursor = 'pointer';
-
-        wrapper.appendChild(greet);
-        wrapper.appendChild(btn);
-
-        // insert before cart if present, otherwise append (desktop)
-        if (cartWrapper) rightArea.insertBefore(wrapper, cartWrapper);
-        else rightArea.appendChild(wrapper);
-      }
-
-      // Also render a mobile-friendly block inside the mobile sidebar (bottom)
-      const mobileSidebar = document.getElementById('mobileSidebar');
-      let mobileBlock = null;
-      if (mobileSidebar) {
-        // Create mobile block (styles provided in `master.css` responsive rules)
-        mobileBlock = document.createElement('div');
-        mobileBlock.className = 'mobile-header-user';
-
-        const mobileGreet = document.createElement('div');
-        mobileGreet.className = 'greet';
-        mobileGreet.textContent = 'مرحبا ' + (session.user?.name || '');
-
-        const mobileLogout = document.createElement('button');
-        mobileLogout.className = 'mobile-logout-btn';
-        mobileLogout.type = 'button';
-        mobileLogout.textContent = 'تسجيل الخروج';
-
-        mobileBlock.appendChild(mobileGreet);
-        mobileBlock.appendChild(mobileLogout);
-
-        // insert mobile block at the top of the sidebar content so it appears when opened
-        try {
-          // place after sidebar header if exists
-          const sidebarHeader = mobileSidebar.querySelector('.mobile-sidebar-header');
-          if (sidebarHeader && sidebarHeader.parentElement) {
-            sidebarHeader.parentElement.insertBefore(mobileBlock, sidebarHeader.nextSibling);
-          } else {
-            mobileSidebar.insertBefore(mobileBlock, mobileSidebar.firstChild);
-          }
-        } catch (e) {
-          // fallback
-          mobileSidebar.appendChild(mobileBlock);
-        }
-
-        // hide desktop injected wrapper on mobile
-        if (isMobile && wrapper) {
-          try { wrapper.style.display = 'none'; } catch (e) {}
-        }
-
-        // hide inline login/register in header for mobile when session exists
-        try {
-          if (isMobile) {
-            if (loginBtn) loginBtn.style.display = 'none';
-            if (registerBtn) registerBtn.style.display = 'none';
-            if (profileBtn) profileBtn.style.display = 'none';
-            if (ordersBtn) ordersBtn.style.display = 'none';
-          }
-        } catch (e) {}
-
-        mobileLogout.addEventListener('click', () => {
-          try {
-            const sessionData = localStorage.getItem('motorstore_session');
-            if (sessionData) {
-              const sess = JSON.parse(sessionData);
-              if (sess && sess.user && sess.user.email) {
-                saveCartForEmail(sess.user.email);
-              }
-            }
-          } catch (e) { console.warn('Failed to persist cart on mobile logout', e); }
-          try { localStorage.removeItem('cart'); } catch (e) {}
-          cart = [];
-          try { localStorage.removeItem('motorstore_session'); } catch (e) {}
-          // remove desktop injected block if present
-          if (wrapper) wrapper.remove();
-          // remove mobile block
-          if (mobileBlock) mobileBlock.remove();
-          // update UI
-          checkUserLogin();
-          updateCartBadge();
-          try { renderCart(); } catch (e) {}
-          // close sidebar if open
-          try { closeMobileMenu(); } catch (e) {}
-          window.location.reload();
-        });
-      }
-
-      if (btn) {
-        btn.addEventListener('click', () => {
-        try {
-          // persist current cart to the user's saved cart
+      // allow pages to opt-out by setting `window.__disableHeaderUser = true` before this script runs
+      if (window && window.__disableHeaderUser) return;
+      
+      // قراءة الجلسة
+      let session = null;
+      try {
           const sessionData = localStorage.getItem('motorstore_session');
           if (sessionData) {
-            const sess = JSON.parse(sessionData);
-            if (sess && sess.user && sess.user.email) {
-              saveCartForEmail(sess.user.email);
-            }
+              session = JSON.parse(sessionData);
+              if (session.expiresAt && Date.now() > session.expiresAt) {
+                  localStorage.removeItem('motorstore_session');
+                  session = null;
+              }
           }
-        } catch (e) { console.warn('Failed to persist cart on header logout', e); }
-        try { localStorage.removeItem('cart'); } catch (e) {}
-        cart = [];
-        try { localStorage.removeItem('motorstore_session'); } catch (e) {}
-        // show original user icon again
-        if (userWrapper) userWrapper.style.display = '';
-        wrapper.remove();
-        // update other UI parts and cart UI
-        checkUserLogin();
-        updateCartBadge();
-        try { renderCart(); } catch (e) {}
-        // reload to ensure state consistency
-        window.location.reload();
-        });
+      } catch (e) {
+          session = null;
       }
-    } else {
-      if (userWrapper) userWrapper.style.display = '';
-    }
+
+      const header = document.querySelector('header.header-section');
+      if (!header) return;
+      const container = header.querySelector('.container');
+      if (!container) return;
+
+      // right area usually the second child
+      const rightArea = container.children[1] || container.querySelector(':scope > div:last-child');
+      if (!rightArea) return;
+
+      // ⭐️⭐️ إزالة أي عناصر مستخدم موجودة مسبقاً ⭐️⭐️
+      const prevHeaderUser = rightArea.querySelector('.header-user');
+      if (prevHeaderUser) prevHeaderUser.remove();
+
+      const prevMobileUser = document.querySelector('.mobile-header-user');
+      if (prevMobileUser) prevMobileUser.remove();
+
+      // ⭐️⭐️ البحث عن جميع عناصر user-wrapper وإخفاؤها ⭐️⭐️
+      const userWrappers = rightArea.querySelectorAll('.user-wrapper, #userWrapper');
+      
+      if (session && session.user) {
+          // ⭐️⭐️ إخفاء جميع عناصر user-wrapper الأصلية ⭐️⭐️
+          userWrappers.forEach(wrapper => {
+              wrapper.style.display = 'none';
+          });
+
+          // Determine mobile/desktop via body classes set by detectDevice()
+          const isMobile = document.body.classList.contains('device-mobile');
+          
+          if (!isMobile) {
+              // ⭐️⭐️ DESKTOP: Create Clickable Greeting and Dropdown Menu ⭐️⭐️
+              
+              // 1. Create the wrapper
+              const wrapper = document.createElement('div');
+              wrapper.className = 'header-user';
+              wrapper.style.display = 'flex';
+              wrapper.style.alignItems = 'center';
+              wrapper.style.gap = '10px';
+              wrapper.style.cursor = 'pointer';
+
+              // 2. The clickable greeting/toggle element
+              const greet = document.createElement('div');
+              greet.className = 'header-greeting-toggle';
+              greet.innerHTML = `<i class="fa-solid fa-user" style="margin-left: 6px;"></i> مرحبا ${session.user.name || ''}`;
+              
+              // 3. The Menu Dropdown Structure
+              const menu = document.createElement('div');
+              menu.className = 'header-user-menu';
+              menu.id = 'headerUserMenu';
+
+              // 3a. متابعة طلباتك (Continue orders)
+              const ordersLink = document.createElement('a');
+              ordersLink.href = '#'; 
+              ordersLink.textContent = 'متابعة طلباتك';
+              ordersLink.onclick = (e) => {
+                  e.preventDefault();
+                  alert('صفحة الطلبات - سيتم إضافتها قريباً');
+                  menu.classList.remove('active');
+              };
+              menu.appendChild(ordersLink);
+
+              // 3b. تسجيل الخروج (Logout) - Red Button
+              const logoutBtnMenu = document.createElement('button');
+              logoutBtnMenu.className = 'logout-action';
+              logoutBtnMenu.type = 'button';
+              logoutBtnMenu.textContent = 'تسجيل الخروج';
+              logoutBtnMenu.addEventListener('click', handleLogout);
+              menu.appendChild(logoutBtnMenu);
+
+              wrapper.appendChild(greet);
+              wrapper.appendChild(menu);
+
+              // 4. Toggle functionality
+              wrapper.addEventListener('click', (e) => {
+                  e.stopPropagation(); 
+                  menu.classList.toggle('active');
+              });
+
+              // Close menu when clicking anywhere else on the page
+              document.addEventListener('click', (e) => {
+                  if (!wrapper.contains(e.target)) {
+                      menu.classList.remove('active');
+                  }
+              });
+              
+              // Insertion logic - إدراج العنصر الجديد في المكان الصحيح
+              const cartWrapper = rightArea.querySelector('.cart-wrapper, #cartWrapper');
+              if (cartWrapper) {
+                  rightArea.insertBefore(wrapper, cartWrapper);
+              } else {
+                  rightArea.appendChild(wrapper);
+              }
+          }
+
+          // ⭐️⭐️ MOBILE: Create user block in sidebar ⭐️⭐️
+          const mobileSidebar = document.getElementById('mobileSidebar');
+          if (mobileSidebar) {
+              // Remove any existing mobile user block first
+              const existingMobileUser = mobileSidebar.querySelector('.mobile-header-user');
+              if (existingMobileUser) existingMobileUser.remove();
+
+              const mobileBlock = document.createElement('div');
+              mobileBlock.className = 'mobile-header-user';
+
+              const mobileGreet = document.createElement('div');
+              mobileGreet.className = 'greet';
+              mobileGreet.textContent = 'مرحبا ' + (session.user.name || '');
+
+              // ⭐️⭐️ إضافة رابط متابعة الطلبات في الموبايل ⭐️⭐️
+              const mobileOrders = document.createElement('button');
+              mobileOrders.className = 'mobile-orders-btn';
+              mobileOrders.type = 'button';
+              mobileOrders.textContent = 'متابعة طلباتك';
+              mobileOrders.style.cssText = `
+                  display: block;
+                  width: 100%;
+                  padding: 12px;
+                  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                  color: #fff;
+                  border: none;
+                  border-radius: 8px;
+                  cursor: pointer;
+                  font-weight: 700;
+                  font-size: 16px;
+                  margin-bottom: 12px;
+                  transition: all var(--transition-fast);
+              `;
+              mobileOrders.onclick = () => {
+                  alert('صفحة الطلبات - سيتم إضافتها قريباً');
+                  closeMobileMenu();
+              };
+
+              const mobileLogout = document.createElement('button');
+              mobileLogout.className = 'mobile-logout-btn';
+              mobileLogout.type = 'button';
+              mobileLogout.textContent = 'تسجيل الخروج';
+
+              mobileBlock.appendChild(mobileGreet);
+              mobileBlock.appendChild(mobileOrders); // ⭐️ إضافة زر الطلبات
+              mobileBlock.appendChild(mobileLogout);
+
+              // Insert mobile block at the top of the sidebar content
+              try {
+                  const sidebarHeader = mobileSidebar.querySelector('.mobile-sidebar-header');
+                  if (sidebarHeader && sidebarHeader.parentElement) {
+                      sidebarHeader.parentElement.insertBefore(mobileBlock, sidebarHeader.nextSibling);
+                  } else {
+                      mobileSidebar.insertBefore(mobileBlock, mobileSidebar.firstChild);
+                  }
+              } catch (e) {
+                  mobileSidebar.appendChild(mobileBlock);
+              }
+
+              // ربط دالة تسجيل الخروج
+              mobileLogout.addEventListener('click', handleLogout);
+          }
+
+      } else {
+          // User is not logged in - show original user wrappers
+          userWrappers.forEach(wrapper => {
+              wrapper.style.display = '';
+          });
+      }
   }
 
   // Ensure header reflects current session on load unless a page opts out
@@ -472,12 +497,29 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       cartList.appendChild(totalRow);
 
-      // Checkout button
-      const checkoutWrap = document.createElement('div');
-      checkoutWrap.style.display = 'flex';
-      checkoutWrap.style.justifyContent = 'center';
-      checkoutWrap.style.padding = '12px';
+      // Buttons container (Clear Cart and Checkout)
+      const buttonsWrap = document.createElement('div');
+      buttonsWrap.style.display = 'flex';
+      buttonsWrap.style.justifyContent = 'space-between';
+      buttonsWrap.style.gap = '10px';
+      buttonsWrap.style.padding = '12px';
       
+      // 1. Clear Cart button
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'clear-cart-btn';
+      clearBtn.textContent = 'إفراغ السلة';
+      clearBtn.style.background = '#dc3545'; // Danger Red
+      clearBtn.style.color = '#fff';
+      clearBtn.style.border = 'none';
+      clearBtn.style.padding = '10px 12px';
+      clearBtn.style.borderRadius = '8px';
+      clearBtn.style.cursor = 'pointer';
+      clearBtn.style.flex = '1';
+      
+      clearBtn.addEventListener('click', clearCart);
+      
+      // 2. Checkout button
       const checkoutBtn = document.createElement('button');
       checkoutBtn.type = 'button';
       checkoutBtn.className = 'checkout-btn';
@@ -485,9 +527,10 @@ document.addEventListener('DOMContentLoaded', () => {
       checkoutBtn.style.background = 'var(--header-gradient)';
       checkoutBtn.style.color = '#fff';
       checkoutBtn.style.border = 'none';
-      checkoutBtn.style.padding = '10px 16px';
+      checkoutBtn.style.padding = '10px 12px';
       checkoutBtn.style.borderRadius = '8px';
       checkoutBtn.style.cursor = 'pointer';
+      checkoutBtn.style.flex = '1';
       
       // إضافة وظيفة الانتقال هنا
       checkoutBtn.addEventListener('click', () => {
@@ -504,8 +547,10 @@ document.addEventListener('DOMContentLoaded', () => {
           document.body.classList.remove('cart-open');
       });
       
-      checkoutWrap.appendChild(checkoutBtn);
-      cartList.appendChild(checkoutWrap);
+      buttonsWrap.appendChild(clearBtn);
+      buttonsWrap.appendChild(checkoutBtn);
+      cartList.appendChild(buttonsWrap);
+
     } catch (e) {
       console.warn('Failed to render cart total or checkout', e);
     }
@@ -571,6 +616,31 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartBadge();
     renderCart();
+  }
+  
+  // ⭐️ دالة إفراغ السلة بالكامل ⭐️
+  function clearCart() {
+    if (confirm('هل أنت متأكد أنك تريد إفراغ السلة بالكامل؟')) {
+        // Check if user is logged in to save the empty cart
+        let session = JSON.parse(localStorage.getItem('motorstore_session'));
+        let userEmail = session && session.user ? session.user.email : null;
+        
+        cart = []; // Clear the cart array
+        localStorage.setItem('cart', JSON.stringify(cart)); // Save to default local storage
+        if (userEmail) {
+            saveCartForEmail(userEmail); // Save empty cart to user's storage
+        }
+        
+        updateCartBadge();
+        renderCart();
+        // Close dropdown after clearing
+        try {
+          cartDropdown.style.display = 'none';
+          cartBtn.setAttribute('aria-expanded', 'false');
+          cartDropdown.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('cart-open');
+        } catch (e) { /* ignore if elements not found */ }
+    }
   }
 
   // Update item quantity in cart
@@ -815,6 +885,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Close dropdown on outside click
   document.addEventListener('click', (e) => {
+    // Close Cart dropdown
     if (!cartBtn.contains(e.target) && !cartDropdown.contains(e.target)) {
       cartDropdown.style.display = 'none';
       cartBtn.setAttribute('aria-expanded', 'false');
@@ -822,7 +893,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('cart-open');
     }
     
-    // Close user dropdown on outside click
+    // Close user dropdown (original icon) on outside click
     if (userBtn && userDropdown && !userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
       userDropdown.style.display = 'none';
       userBtn.setAttribute('aria-expanded', 'false');
@@ -897,6 +968,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (logoutBtn) {
+    // ⭐️ تم استبدال هذا المستمع بدالة handleLogout وربطه بالزر الجديد ⭐️
     logoutBtn.addEventListener('click', () => {
       if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
         // Save current cart to user's cart storage, then clear global cart
@@ -1103,10 +1175,27 @@ document.addEventListener('DOMContentLoaded', () => {
       product.setAttribute('data-sold', isSoldOut || stock === 0);
     });
   }
+  
+  // ⭐️⭐️ الحل لمشكلة العودة للخلف (Back Button) ⭐️⭐️
+  // نستخدم حدث 'pageshow' للتأكد من إعادة تحميل حالة السلة والمنتجات بشكل إجباري
+  window.addEventListener('pageshow', (event) => {
+    // التحقق مما إذا كانت الصفحة يتم استعادتها من ذاكرة التخزين المؤقت للمتصفح (BFCache)
+    if (event.persisted) {
+      // إعادة تحميل بيانات السلة، وإعادة عرض المنتجات وتحديث المخزون
+      // هذا يضمن أن السلة ستظهر بالبيانات الصحيحة عند العودة من صفحة أخرى (مثل صفحة تسجيل الدخول)
+      cart = JSON.parse(localStorage.getItem('cart')) || []; // إعادة قراءة السلة من التخزين
+      updateCartBadge();
+      renderCart();
+      initializeProductStock();
+      renderHeaderUser(); // ⭐️ إعادة تحميل واجهة المستخدم
+    }
+  });
+  // ⭐️⭐️ نهاية الحل لمشكلة العودة للخلف ⭐️⭐️
 
-  // Initialize
+  // Initialize on initial page load (DOMContentLoaded)
   updateCartBadge();
   renderCart();
   initializeProductStock();
+  renderHeaderUser(); // ⭐️ التأكد من تحميل واجهة المستخدم
 
 });
