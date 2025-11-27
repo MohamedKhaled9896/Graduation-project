@@ -1,0 +1,891 @@
+/* ===============================
+   MOTOR STORE - style.css
+   التنسيقات الخاصة بصفحة index.html فقط
+   (تم تعديل تصميم الكروت بالكامل ليتطابق مع الصورة ال
+   سلة بألوان الموقع وتعديل تناسق أزرار الكمية)
+   =============================== */
+
+/* ===============================
+   MAIN LAYOUT (index.html only)
+   =============================== */
+main {
+  display: flex;
+  gap: 20px;
+  padding: 24px 0;
+  flex: 1; /* Allow main to grow and push footer down */
+}
+
+aside {
+  width: 260px;
+  flex-shrink: 0;
+}
+
+/* Content section */
+.content {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* ===============================
+   CARDS (Sidebar & general)
+   =============================== */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px var(--shadow);
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 26px var(--shadow);
+}
+
+/* Headings inside cards */
+.card h2, .card h3, .card h4 {
+  margin-bottom: 10px;
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+/* Categories list (sidebar) */
+.categories ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.categories li {
+  padding: 10px 6px;
+  cursor: pointer;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  border-radius: 8px;
+  color: #333;
+}
+
+.categories li:hover,
+.categories li.active {
+  color: var(--primary);
+  background: rgba(0,123,255,0.06);
+  transform: translateX(-4px);
+  font-weight: 600;
+}
+
+/* Price filter inputs (keep inline-styles support) */
+input[type="number"], input[type="text"] {
+  font-family: var(--font-family);
+}
+
+/* ===============================
+   PRODUCTS GRID
+   =============================== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+}
+
+/* Product card - تصميم موحد بخلفية بيضاء وشريط سفلي ملون */
+.product {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 6px 14px var(--shadow);
+  padding: 0; /* تم إزالة الـ padding لدمج الشريط السفلي */
+  border: 1px solid var(--border);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden; /* مهم لضمان احتواء الشريط السفلي */
+}
+
+.product:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.06);
+}
+
+.product .img {
+  text-align: center;
+  margin-bottom: 12px;
+  min-height: 48px;
+  position: relative;
+  padding: 16px 16px 0; /* padding علوي للحفاظ على مسافة الصورة */
+}
+
+/* Product image (unified icon) */
+.product .img img {
+  width: 100%;
+  height: 160px; /* ثابت ارتفاع مناسب */
+  object-fit: contain;
+  display: block;
+  background: transparent;
+  padding: 8px;
+}
+
+.product h4 {
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: #222;
+  text-align: center; 
+  padding: 0 16px; /* إضافة padding جانبي للمحتوى */
+}
+
+.product .brand {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+  padding: 0 16px; /* إضافة padding جانبي للمحتوى */
+}
+
+/* Stock info */
+.product .stock-info {
+  color: #28a745;
+  font-size: 12px;
+  margin-bottom: 8px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 16px; /* إضافة padding جانبي للمحتوى */
+}
+
+.product .stock-info i {
+  font-size: 11px;
+}
+
+.product .stock-count {
+  font-weight: 600;
+  color: #28a745;
+}
+
+/* Sold out badge - تم تعديل اللون للون الأحمر الذي طلبه المستخدم */
+.sold-out-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(235, 12, 34, 0.95); /* اللون الأحمر */
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(235, 12, 34, 0.4); 
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.product.sold-out .img::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  z-index: 5;
+}
+
+.product.sold-out .img img {
+  opacity: 0.6;
+  filter: grayscale(50%);
+}
+
+/* price row separated from actions */
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center align price */
+  padding: 8px 16px 0; /* إضافة padding جانبي و إزالة padding سفلي */
+}
+
+.product .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0 16px 16px; /* إضافة padding جانبي وسفلي للمحتوى العلوي */
+}
+
+.product .price {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 15px;
+}
+
+/* Actions area (buttons inserted dynamically by JS) */
+.product .actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0; /* إزالة الفراغ بين الأزرار */
+  margin-top: 0;
+  width: 100%; /* تأكد من أنه يأخذ كامل العرض */
+}
+
+/* Buttons (add/qty/cancel) - تصميم شريط سفلي عريض */
+.add-btn, .qty-btn {
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark)); 
+  color: #fff;
+  border: none;
+  padding: 10px; /* تم التصغير */
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 14px; 
+  font-weight: 700;
+  transition: opacity var(--transition-fast);
+  box-shadow: none;
+  width: 100%;
+  transform: none;
+}
+
+.add-btn:hover, .qty-btn:hover {
+  transform: none;
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+/* Cancel Button - تم تعديل اللون للون الأحمر الذي طلبه المستخدم */
+.cancel-btn {
+  background-color: rgb(235 12 34); /* اللون الأحمر */
+  color: #fff;
+  border: none;
+  padding: 10px; 
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 14px; 
+  font-weight: 700;
+  transition: opacity var(--transition-fast);
+  box-shadow: none;
+  width: 100%;
+  transform: none;
+}
+
+.cancel-btn:hover {
+  transform: none;
+  opacity: 0.95;
+}
+
+/* Qty controls - تجميع أزرار الكمية معاً في شريط */
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+}
+
+/* تعديل أزرار الزيادة والنقصان داخل شريط الكمية (تصميم الديسكتوب الافتراضي قبل الإخفاء) */
+.qty-controls .qty-btn {
+  width: 38px; /* حجم ثابت صغير ومناسب */
+  flex-shrink: 0; 
+  padding: 10px 0;
+  text-align: center;
+  font-size: 16px; 
+}
+
+/* تعديل مدخل الكمية: تم تثبيت العرض ليتناسب مع 3 أرقام */
+.qty-controls .qty-input {
+  width: 35px; /* تم التعديل: عرض ثابت أصغر ليناسب 3 أرقام */
+  flex-grow: 0; /* تم إلغاء التمدد */
+  text-align: center;
+  border: none;
+  border-radius: 0;
+  padding: 10px 6px; 
+  font-size: 15px; 
+  background-color: #fff;
+  color: #333;
+}
+
+/* When qty-controls injected, keep them inline then place confirm/cancel full width on mobile */
+.qty-controls .qty-input {
+  width: 35px; /* تم التعديل */
+}
+
+/* On small screens stack confirm/cancel vertically for touch */
+@media (max-width: 768px) {
+  .actions { flex-direction: column; }
+  .qty-controls { 
+    width: 100%; 
+    justify-content: center;
+    gap: 0;
+  }
+  
+  /* ⭐️ تعديلات أزرار الكمية على الموبايل: جعلها دائرية ⭐️ */
+  .qty-controls .qty-btn {
+    width: 50px; /* حجم أكبر مناسب للمس */
+    height: 50px; /* ⭐️ تحديد الارتفاع لجعله مربعاً */
+    padding: 0; /* ⭐️ إزالة الحشو الداخلي */
+    font-size: 18px;
+    border-radius: 50% !important; /* ⭐️ جعل الزر دائرياً */
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .qty-controls .qty-input {
+    width: 50px; /* عرض ثابت صغير للموبايل */
+    flex-grow: 0; 
+    padding: 16px 6px;
+    font-size: 16px;
+  }
+
+  .actions .confirm-add, .actions .cancel-btn { width: 100%; }
+}
+
+/* ============================================== */
+/* ⭐️ تعديلات العداد (+/-) لسطح المكتب (إخفاء + و -) ⭐️ */
+/* ============================================== */
+@media (min-width: 769px) {
+    /* 1. إخفاء أزرار الزيادة والنقصان (+/-) */
+    .qty-controls .qty-btn {
+        display: none !important; 
+    }
+
+    /* 2. توسيع حقل الكمية ليملأ الفراغ */
+    .qty-controls {
+        width: 100%;
+        justify-content: center; /* توسيط حقل الإدخال */
+    }
+    
+    .qty-controls .qty-input {
+        width: 100%; /* اجعل حقل الإدخال يأخذ عرض حاوية العداد بالكامل */
+        flex-grow: 1; 
+        text-align: center;
+    }
+}
+/* ============================================== */
+/* ⭐️ نهاية تعديلات العداد (+/-) ⭐️ */
+/* ============================================== */
+
+
+/* Category-specific product classes with unique colors */
+/* تم توحيد تصميم البطاقات، وإزالة التنسيقات المخصصة للخلفية والظل */
+/* وإبقاء تنسيق الحدود فقط لتمييز بسيط (إن وُجد) */
+.product.brakes, .product.lights, .product.filters, .product.suspension, .product.cooling {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border); /* توحيد الحدود */
+  box-shadow: 0 6px 14px var(--shadow); /* توحيد الظل */
+  position: relative;
+  overflow: hidden;
+}
+
+.product.brakes:hover, .product.lights:hover, .product.filters:hover, .product.suspension:hover, .product.cooling:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.06);
+  border-color: var(--border);
+}
+
+
+/* ===============================
+   SIDEBAR + SUPPORTING CLASSES
+   =============================== */
+.sidebar-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 10px;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-card:hover {
+  box-shadow: 0 8px 18px var(--shadow);
+  transform: translateY(-4px);
+}
+
+/* ===============================
+   CART / DROPDOWN / SMALL UI TWEAKS
+   =============================== */
+/* small helper for hidden elements (used by JS) */
+.hidden {
+  display: none !important;
+}
+
+/* ===============================
+   RESPONSIVE (index.html only)
+   =============================== */
+@media (max-width: 1024px) and (min-width: 769px) {
+  aside {
+    width: 220px; /* slightly narrower aside for tablets */
+  }
+
+  .grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns for tablet screens */
+    gap: 14px; /* Reduce gap for better fit */
+  }
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+    padding: 18px 0 120px;
+  }
+
+  aside {
+    width: 100%;
+    order: 2; /* push sidebar below content on mobile by default */
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 8px;
+  }
+
+  /* Product card improvements for mobile */
+  .product {
+    padding: 0; 
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border-width: 3px;
+  }
+
+  /* Enhanced border visibility on mobile */
+  .product.brakes,
+  .product.lights,
+  .product.filters,
+  .product.suspension,
+  .product.cooling {
+    border-width: 3px;
+  }
+
+  .product .img {
+    margin-bottom: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .product .img img {
+    height: 200px;
+    object-fit: contain;
+    padding: 4px;
+  }
+
+  .product h4 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding: 0 16px; /* إضافة padding جانبي */
+  }
+
+  .product .brand {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: #666;
+    font-weight: 600;
+    padding: 0 16px; /* إضافة padding جانبي */
+  }
+
+  .price-row {
+    padding: 12px 16px 0; /* تعديل الـ padding السفلي */
+    margin-bottom: 8px;
+  }
+
+  .product .price {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .product .actions {
+    margin-top: 0; 
+  }
+
+  .product .row {
+    flex-direction: column; 
+    align-items: flex-start;
+    gap: 8px;
+    padding: 0 16px 16px; /* إضافة padding جانبي */
+  }
+
+  .qty-controls {
+    gap: 0;
+  }
+
+
+  .add-btn, .qty-btn, .cancel-btn {
+    padding: 16px 20px; 
+    font-size: 16px;
+    width: 100%;
+    border-radius: 0; 
+    font-weight: 700;
+  }
+
+  /* Hide desktop sidebar on mobile */
+  main > aside {
+    display: none;
+  }
+
+  /* Hamburger Menu Button */
+  .menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    transition: transform var(--transition-fast);
+    z-index: 100;
+  }
+
+  .menu-toggle:hover {
+    transform: scale(1.1);
+  }
+
+  /* Mobile Sidebar Overlay */
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity var(--transition-medium);
+  }
+
+  .mobile-overlay.active {
+    display: block;
+    opacity: 1;
+  }
+
+  /* Mobile Sidebar */
+  .mobile-sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: var(--card-bg);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+    transition: right var(--transition-medium);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-sidebar.active {
+    right: 0;
+  }
+
+  .mobile-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--header-gradient);
+    color: #fff;
+  }
+
+  .mobile-sidebar-header h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+  }
+
+  .close-menu-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background var(--transition-fast);
+  }
+
+  .close-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .mobile-sidebar-content {
+    padding: 16px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* Prevent body scroll when menu is open */
+  body.menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* Hide hamburger menu and mobile search on desktop */
+@media (min-width: 769px) {
+  .menu-toggle {
+    display: none;
+  }
+
+  .mobile-overlay,
+  .mobile-sidebar {
+    display: none !important;
+  }
+}
+
+/* replaced: keep .login-btn minimal so .btn-ghost from master.css controls appearance */
+.login-wrapper { display: flex; align-items: center; }
+
+/* If .btn-ghost is present it provides the visual style.
+   Keep .login-btn selector available for small tweaks (no gradient override). */
+.login-btn{
+  /* keep accessibility/usability defaults; visual handled by .btn-ghost */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  font-family: var(--font-family, "Segoe UI", Tahoma, Arial, sans-serif);
+}
+
+/* responsive: keep compact but visible on small screens */
+@media (max-width: 720px){
+  .login-btn { padding: 8px 10px; border-radius: 10px; font-size: 14px; }
+}
+
+/* adjust spacing between header controls */
+.header-section .container > div:last-child { gap: 8px; }
+
+/* Utility spacing (kept minimal so you can expand later) */
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mb-8 { margin-bottom: 8px; }
+.p-8 { padding: 8px; }
+
+/* ===============================
+   CUSTOM USER MENU - DESKTOP
+   =============================== */
+
+/* Custom User Menu Dropdown (Desktop) */
+.header-user {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+}
+
+.header-greeting-toggle {
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color var(--transition-fast);
+}
+
+.header-greeting-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.header-user-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 200px;
+  background-color: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  padding: 0;
+  display: none;
+  text-align: right;
+  overflow: hidden;
+}
+
+.header-user-menu.active {
+  display: block;
+}
+
+.header-user-menu a {
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.header-user-menu a:hover {
+  background-color: #f8f9fa;
+  color: var(--primary);
+}
+
+/* Red Logout Button Style */
+.header-user-menu .logout-action {
+  color: #fff;
+  background-color: rgba(235, 12, 34, 0.95);
+  border: none;
+  padding: 12px 16px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.header-user-menu .logout-action:hover {
+  background-color: rgb(220, 0, 20);
+}
+
+/* -------------------------------
+   MOBILE SIDEBAR USER INFO STYLES
+   ------------------------------- */
+/* -------------------------------
+   MOBILE SIDEBAR USER INFO STYLES (3-BAR MENU)
+   ------------------------------- */
+.mobile-header-user {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  background-color: #f8f9fa; /* خلفية فاتحة */
+  text-align: center; /* ⭐️ تم التعديل: لتوسيط كلمة 'مرحباً' */
+}
+
+.mobile-header-user .greet {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 10px;
+}
+
+/* Mobile Orders Button (تم الإبقاء عليها كما هي) */
+.mobile-header-user .mobile-orders-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+  transition: all var(--transition-fast);
+}
+
+.mobile-header-user .mobile-orders-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile Logout Button */
+.mobile-header-user .mobile-logout-btn {
+  width: 100%;
+  padding: 10px;
+  /* ⭐️ الحل النهائي: استخدام 'background' مع '!important' لتجاوز التدرج اللوني */
+  background: rgb(235, 12, 34) !important; /* تثبيت اللون الأحمر للخلفية */
+  color: #fff !important; /* تثبيت اللون الأبيض للخط */
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mobile-header-user .mobile-logout-btn:hover {
+  /* تأكيد اللون الأحمر الداكن عند المرور */
+  background: rgb(200, 10, 30) !important;
+}
+
+/* Hide desktop greeting on mobile */
+@media (max-width: 768px) {
+  .header-user {
+    display: none !important;
+  }
+}
+
+/* Show in mobile sidebar */
+@media (max-width: 768px) {
+  .mobile-header-user {
+    display: block !important;
+  }
+}
+
+/* ===============================
+   FIXES FOR HEADER USER MENU
+   =============================== */
+
+/* تأكيد ظهور العنصر الجديد */
+.header-user {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.header-greeting-toggle {
+  font-weight: 700;
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color var(--transition-fast);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.header-greeting-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* تأكيد إخفاء العناصر الأصلية */
+.user-wrapper[style*="display: none"],
+.user-wrapper[style*="display:none"] {
+  display: none !important;
+}
+
+/* تأكيد ظهور العنصر الجديد */
+.header-user[style*="display: flex"],
+.header-user[style*="display:flex"] {
+  display: flex !important;
+}
+
+/* تحسين مظهر القائمة المنبثقة */
+.header-user-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 200px;
+  background-color: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  padding: 0;
+  display: none;
+  text-align: right;
+  overflow: hidden;
+}
+
+.header-user-menu.active {
+  display: block !important;
+}
