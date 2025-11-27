@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>شكراً لك | موتور ستور</title>
+    <link rel="icon" type="image/png" href="../images/motor-store-favicon.png"> 
+    <link rel="stylesheet" href="../master.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* التنسيقات الخاصة بصفحة الشكر */
+        body {
+            background-color: var(--light-bg); 
+            font-family: var(--font-family);
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .thank-you-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 30px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow);
+            text-align: center;
+            /* اللون الأحمر الداكن الجديد */
+            border-top: 5px solid var(--primary); 
+            margin: 20px;
+        }
+        
+        /* تنسيقات اللوجو واسم الموقع */
+        .thank-you-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .thank-you-header a {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* توسيط الشعار والنص */
+            text-decoration: none;
+        }
+
+        .header-logo {
+            height: 35px; /* حجم مناسب للشعار */
+            margin-left: 10px;
+        }
+        
+        .header-site-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-dark); /* استخدام اللون الأحمر الداكن */
+        }
+
+        .thank-you-icon {
+            color: var(--primary); 
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        p {
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .order-info {
+            background-color: var(--light-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px dashed var(--border);
+        }
+
+        .order-info p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .return-home-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: var(--header-gradient); 
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition-fast);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .return-home-btn:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        
+        footer {
+            display: none; 
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div class="thank-you-container">
+        
+        <div class="thank-you-header">
+            <a href="../index.html" title="العودة للصفحة الرئيسية">
+                <img src="../images/icon.png" alt="موتور ستور" class="header-logo">
+                <span class="header-site-name">موتور ستور</span>
+            </a>
+        </div>
+        <i class="fa-solid fa-circle-check thank-you-icon"></i>
+        
+        <h1 id="thankYouTitle">شكراً لك على طلبك!</h1>
+        
+        <p>
+            تم استلام طلبك بنجاح. سنقوم بالاتصال بك قريباً لتأكيد التفاصيل النهائية للشحن والتوصيل.
+        </p>
+
+        <div class="order-info">
+            <p><strong>رقم الطلب الافتراضي:</strong> #MOT-57492</p>
+            <p><strong>تاريخ الطلب:</strong> <span id="orderDate"></span></p>
+            <p><strong>طريقة الدفع:</strong> سيتم تأكيدها عند الاتصال.</p>
+        </div>
+        
+        <a href="../index.html" class="return-home-btn">العودة للصفحة الرئيسية</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const customerName = urlParams.get('name');
+            const titleElement = document.getElementById('thankYouTitle');
+            const dateElement = document.getElementById('orderDate');
+            
+            // 1. عرض الاسم في العنوان (مرة واحدة فقط)
+            if (customerName && titleElement) {
+                // يعرض "شكراً لك يا [الاسم]!"
+                titleElement.textContent = `شكراً لك يا ${decodeURIComponent(customerName)}!`;
+            }
+
+            // 2. عرض تاريخ اليوم
+            const today = new Date();
+            const dateString = today.toLocaleDateString('ar-EG', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            dateElement.textContent = dateString;
+            
+            // 3. مسح معلومات الاسم من الرابط
+            if (window.history.replaceState) {
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState(null, null, cleanUrl);
+            }
+        });
+    </script>
+</body>
+</html>
